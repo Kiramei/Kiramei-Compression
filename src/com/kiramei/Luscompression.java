@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -155,7 +156,17 @@ public class Luscompression {
 		System.exit(0);
 		return "";
 	}
-
+	private static long length(File dir) {
+		long length=0;
+		for (File x : dir.listFiles()) {
+			if (x.isDirectory()) {
+				//System.out.println(x);
+				length+=length(x);
+			}else
+			length+=x.length();
+		}
+		return length;
+	}
 	public static String getDirectoryPath() {
 		// The same as comp()
 		int result = 0;
@@ -169,9 +180,7 @@ public class Luscompression {
 		result = fc.showOpenDialog(fc);
 		if (JFileChooser.APPROVE_OPTION == result) {
 			// Get the size of original directory.
-			for (int i = 0; i < new File(fc.getSelectedFile().getPath()).listFiles().length; i++) {
-				before += new File(fc.getSelectedFile().getPath()).listFiles()[i].length();
-			}
+			before=length(fc.getSelectedFile());
 			return fc.getSelectedFile().getPath();
 		}
 		System.exit(0);
@@ -193,8 +202,41 @@ public class Luscompression {
 	 * Show the compression ratio.
 	 */
 	public static void showMessage() {
-		double d = (double) after / (double) before;
-		JOptionPane.showMessageDialog(null, "The compression ratio is: 1 : " + d, "Compression ratio",
-				JOptionPane.INFORMATION_MESSAGE);
+		DecimalFormat df = new DecimalFormat("#.00");
+		DecimalFormat df1 = new DecimalFormat("#.00");
+		DecimalFormat df2 = new DecimalFormat("#.00");
+		String k, l;
+		double i, j, d = (double) before / (double) after;
+		if (before >= 1024.0) {
+			if (before >= 1024.0 * 1024.0) {
+				k = "MB";
+				i = before / 1024.0 / 1024.0;
+			} else {
+				k = "KB";
+				i = before / 1024.0;
+			}
+		} else {
+			i = (int)before;
+			k = "B";
+			df1=new DecimalFormat("#");
+		}
+		if (after >= 1024.0) {
+			if (after >= 1024.0 * 1024.0) {
+				l = "MB";
+				j = after / 1024.0 / 1024.0;
+			} else {
+				l = "KB";
+				j = after / 1024.0;
+			}
+		} else {
+			j = (int)after;
+			l = "B";
+			df2=new DecimalFormat("#");
+		}
+
+		JOptionPane.showMessageDialog(null,
+				"<html>Size before compressing: " + df1.format(i) + k + "<br>" + "Size after Compressing: "
+						+ df2.format(j) + l + "<br>The compression ratio is: " + df.format(d) + ":1" + "</html>",
+				"Compression ratio", JOptionPane.INFORMATION_MESSAGE);
 	}
 }
