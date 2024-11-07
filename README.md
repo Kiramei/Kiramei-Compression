@@ -1,4 +1,4 @@
-# Lu-s-Compression  
+# Kiramei-Compression  
 *A project to zip files.  
 *It was developed on August 30, 2019.  
 *The compression format is "zip".  
